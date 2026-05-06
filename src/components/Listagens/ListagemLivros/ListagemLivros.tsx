@@ -1,4 +1,5 @@
 import { useState, useEffect, type JSX } from "react";
+import { useNavigate } from "react-router-dom";
 import type LivroDTO from "../../../dto/LivroDTO";
 import LivroRequests from "../../../fetch/LivroRequests";
 
@@ -6,6 +7,7 @@ function ListagemLivros(): JSX.Element {
     const [livros, setLivros] = useState<LivroDTO[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const buscarLivros = async () => {
@@ -64,7 +66,12 @@ function ListagemLivros(): JSX.Element {
                                         <td className="p-3 md:p-4 hidden lg:table-cell text-center text-slate-600">{livro.quant_disponivel}</td>
                                         <td className="p-2 md:p-4">
                                             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 md:gap-2">
-                                                <button className="w-full sm:w-auto bg-sky-100 text-sky-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-sky-600 hover:text-white transition-all">Detalhes</button>
+                                                <button 
+                                                    className="w-full sm:w-auto bg-sky-100 text-sky-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-sky-600 hover:text-white transition-all hover:cursor-pointer"
+                                                    onClick={() => navigate(`/detalhes/livro/${livro.id_livro}`)}
+                                                >
+                                                    Detalhes
+                                                </button>
                                                 <button className="w-full sm:w-auto bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-emerald-600 hover:text-white transition-all">Atualizar</button>
                                                 <button className="w-full sm:w-auto bg-red-100 text-red-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-red-600 hover:text-white transition-all">Deletar</button>
                                             </div>

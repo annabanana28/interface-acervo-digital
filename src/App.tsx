@@ -7,6 +7,7 @@ import PListagemEmprestimo from './pages/PListagem/PListagemEmprestimo/PListagem
 import PListagemLivro from './pages/PListagem/PListagemLivro/PListagemLivro'
 import PDetalhesAluno from './pages/PDetalhes/PDetalhesAluno/PDetalhesAluno'
 import PDetalhesEmprestimo from './pages/PDetalhes/PDetalhesEmprestimo/PDetalhesEmprestimo'
+import PDetalhesLivro from './pages/PDetalhes/PDetalhesLivro/PDetalhesLivro'
 // import ProtectedRoute from './components/Rotas/ProtectedRoutes'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path='/lista/livros' element={<PListagemLivro />} />
         <Route path='/detalhes/aluno/:id_aluno' element={<PDetalhesAluno />} />
         <Route path='/detalhes/emprestimo/:id_emprestimo' element={<PDetalhesEmprestimo />} />
+        <Route path='/detalhes/livro/:id_livro' element={<PDetalhesLivro />} />
       </Routes>
     </BrowserRouter>
   )
