@@ -23,7 +23,6 @@ function ListagemEmprestimos(): JSX.Element {
         buscarEmprestimos();
     }, []);
 
-    // Lógica de Paginação
     const totalPages = Math.ceil(emprestimos.length / rowsPerPage);
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -103,7 +102,6 @@ function ListagemEmprestimos(): JSX.Element {
                     </table>
                 </div>
 
-                {/* Paginação */}
                 <div className="bg-slate-50 border-t border-slate-200 px-4 py-3 sm:px-6 flex items-center justify-between flex-shrink-0">
                     <div className="flex-1 flex justify-between sm:hidden">
                         <button

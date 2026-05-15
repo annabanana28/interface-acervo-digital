@@ -1,7 +1,7 @@
 import { useState, useEffect, type JSX } from "react";
-import { useNavigate } from "react-router-dom";
 import type LivroDTO from "../../../dto/LivroDTO";
 import LivroRequests from "../../../fetch/LivroRequests";
+import { useNavigate } from "react-router-dom";
 
 function ListagemLivros(): JSX.Element {
     const [livros, setLivros] = useState<LivroDTO[]>([]);
@@ -23,7 +23,6 @@ function ListagemLivros(): JSX.Element {
         buscarLivros();
     }, []);
 
-    // Lógica de Paginação
     const totalPages = Math.ceil(livros.length / rowsPerPage);
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -66,7 +65,7 @@ function ListagemLivros(): JSX.Element {
                                         <td className="p-3 md:p-4 hidden lg:table-cell text-center text-slate-600">{livro.quant_disponivel}</td>
                                         <td className="p-2 md:p-4">
                                             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 md:gap-2">
-                                                <button 
+                                                <button
                                                     className="w-full sm:w-auto bg-sky-100 text-sky-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-sky-600 hover:text-white transition-all hover:cursor-pointer"
                                                     onClick={() => navigate(`/detalhes/livro/${livro.id_livro}`)}
                                                 >
@@ -89,7 +88,6 @@ function ListagemLivros(): JSX.Element {
                     </table>
                 </div>
 
-                {/* Paginação */}
                 <div className="bg-slate-50 border-t border-slate-200 px-4 py-3 sm:px-6 flex items-center justify-between flex-shrink-0">
                     <div className="flex-1 flex justify-between sm:hidden">
                         <button

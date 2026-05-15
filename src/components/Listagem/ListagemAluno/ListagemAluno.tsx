@@ -1,142 +1,78 @@
-import { type JSX } from "react";
-import { useState, useEffect } from "react";
-import AlunoRequests from "../../../fetch/AlunoRequests";
-import type AlunoDTO from "../../../dto/AlunoDTO";
+import { useState, useEffect, type JSX } from "react";
+import AlunoRequests from "../../../fetch/AlunoRequests"; 
 
 function ListagemAlunos(): JSX.Element {
-    const [alunos, setAlunos] = useState<AlunoDTO[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5;
+    const [alunos, setAlunos] = useState<any[]>([]);
 
     useEffect(() => {
-        const buscarAlunos = async () => {
-            try {
-                const listaDeAlunos = await AlunoRequests.obterListaDeAlunos();
-                setAlunos(listaDeAlunos);
-            } catch (error) {
-                console.error(`Erro ao buscar alunos. ${error}`);
-                alert("Erro ao criar a listagem de alunos.");
-            }
-        }
-
-        buscarAlunos();
+        const carregar = async () => {
+            const data = await AlunoRequests.obterListaDeAlunos();
+            setAlunos(data || []);
+        };
+        carregar();
     }, []);
 
-    // Lógica de Paginação
-    const totalPages = Math.ceil(alunos.length / rowsPerPage);
-    const indexOfLastRow = currentPage * rowsPerPage;
-    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-    const currentAlunos = alunos.slice(indexOfFirstRow, indexOfLastRow);
-
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
     return (
-        <main className="bg-gray-200 flex-1 flex flex-col px-4 sm:px-6 md:px-10 py-6 md:py-10 overflow-hidden"> {/* overflow-hidden no main para conter o scroll interno */}
-            <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-4 mb-6 md:mb-8 flex-shrink-0">
-                <h1 className="flex-1 text-xl sm:text-2xl md:text-3xl text-center sm:text-left font-bold text-slate-800">Alunos</h1>
-                <a href="#" className="w-full sm:w-auto px-4 py-2 md:px-6 md:py-3 text-sm md:text-base bg-slate-700 rounded-md text-center text-white font-bold flex items-center justify-center hover:cursor-pointer hover:bg-slate-600 transition-all shadow-md hover:shadow-lg active:scale-95">
-                    Novo Aluno
-                </a>
-            </div>
+        <main className="bg-gray-100 flex-1 flex flex-col px-4 py-8 md:py-12">
+            <div className="w-full max-w-7xl mx-auto">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800">Alunos</h1>
+                    <button className="w-full sm:w-auto bg-slate-700 text-white px-6 py-3 rounded-lg font-bold shadow-md">
+                        <i className="pi pi-user-plus mr-2"></i> Novo Aluno
+                    </button>
+                </div>
 
-            <input type="text" name="busca-aluno" id="busca-aluno" placeholder="Buscar aluno" className="w-full max-w-6xl mx-auto p-3 md:p-2 md:mb-4 border-b-2 border-slate-700 rounded-sm" />
+                {/* VIEW MOBILE (Cards) */}
+                <div className="grid grid-cols-1 gap-4 sm:hidden">
+                    {alunos.map((aluno) => (
+                        <div key={aluno.id_aluno} className="bg-white p-5 rounded-2xl shadow-md border border-slate-200">
+                            <div className="flex items-center gap-4 mb-3">
+                                <div className="bg-slate-100 p-3 rounded-full text-slate-600">
+                                    <i className="pi pi-user text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-900">{aluno.nome} {aluno.sobrenome}</h3>
+                                    <p className="text-xs text-slate-500">RA: {aluno.ra || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-1 mb-4 text-sm text-slate-600">
+                                <p><i className="pi pi-envelope mr-2 text-xs"></i>{aluno.email}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button className="flex-1 bg-sky-100 text-sky-700 py-2 rounded-md font-bold text-sm">Editar</button>
+                                <button className="flex-1 bg-red-100 text-red-700 py-2 rounded-md font-bold text-sm">Excluir</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-            <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-xl border border-slate-300 overflow-hidden">
-                <div className="flex-1 overflow-auto overscroll-none">
-                    <table className="table-auto w-full border-collapse text-xs sm:text-sm md:text-base">
-                        <thead className="bg-slate-700 sticky top-0 z-10 shadow-sm">
+                {/* VIEW DESKTOP (Tabela) */}
+                <div className="hidden sm:block bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-slate-700 text-white">
                             <tr>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 hidden md:table-cell text-left">ID</th>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 text-left">RA</th>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 text-left">Nome</th>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 hidden sm:table-cell text-left">E-mail</th>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 hidden lg:table-cell text-left">Telefone</th>
-                                <th className="border-b border-slate-600 text-white p-3 md:p-4 text-center">Ações</th>
+                                <th className="p-4">RA</th>
+                                <th className="p-4">Nome</th>
+                                <th className="p-4">E-mail</th>
+                                <th className="p-4 text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200">
-                            {currentAlunos && currentAlunos.length > 0 ? (
-                                currentAlunos.map((aluno) => (
-                                    <tr className="text-center md:text-left transition-colors hover:bg-slate-50 group" key={aluno.id_aluno}>
-                                        <td className="p-3 md:p-4 hidden md:table-cell text-slate-500">{aluno.id_aluno}</td>
-                                        <td className="p-3 md:p-4 font-medium text-slate-700">{aluno.ra}</td>
-                                        <td className="p-3 md:p-4 text-slate-700 font-semibold">{aluno.nome} {aluno.sobrenome}</td>
-                                        <td className="p-3 md:p-4 hidden sm:table-cell text-slate-600">{aluno.email}</td>
-                                        <td className="p-3 md:p-4 hidden lg:table-cell text-slate-600">{aluno.celular}</td>
-                                        <td className="p-2 md:p-4">
-                                            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 md:gap-2">
-                                                <button className="w-full sm:w-auto bg-sky-100 text-sky-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-sky-600 hover:text-white transition-all">Detalhes</button>
-                                                <button className="w-full sm:w-auto bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-emerald-600 hover:text-white transition-all">Atualizar</button>
-                                                <button className="w-full sm:w-auto bg-red-100 text-red-700 px-3 py-1.5 rounded-md text-xs md:text-sm font-medium hover:bg-red-600 hover:text-white transition-all">Deletar</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={6} className="text-center p-10 text-slate-500 italic">
-                                        Nenhum aluno encontrado
+                            {alunos.map((aluno) => (
+                                <tr key={aluno.id_aluno} className="hover:bg-slate-50">
+                                    <td className="p-4 text-slate-500">{aluno.ra}</td>
+                                    <td className="p-4 font-semibold text-slate-900">{aluno.nome} {aluno.sobrenome}</td>
+                                    <td className="p-4 text-slate-600">{aluno.email}</td>
+                                    <td className="p-4">
+                                        <div className="flex justify-center gap-3">
+                                            <button className="text-sky-600 hover:scale-110 transition-transform"><i className="pi pi-pencil"></i></button>
+                                            <button className="text-red-600 hover:scale-110 transition-transform"><i className="pi pi-trash"></i></button>
+                                        </div>
                                     </td>
                                 </tr>
-                            )}
+                            ))}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Paginação */}
-                <div className="bg-slate-50 border-t border-slate-200 px-4 py-3 sm:px-6 flex items-center justify-between flex-shrink-0">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                        <button
-                            onClick={() => paginate(Math.max(1, currentPage - 1))}
-                            disabled={currentPage === 1}
-                            className={`relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            Anterior
-                        </button>
-                        <button
-                            onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                            disabled={currentPage === totalPages}
-                            className={`ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            Próximo
-                        </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-sm text-slate-700">
-                                Mostrando <span className="font-semibold">{indexOfFirstRow + 1}</span> até <span className="font-semibold">{Math.min(indexOfLastRow, alunos.length)}</span> de <span className="font-semibold">{alunos.length}</span> resultados
-                            </p>
-                        </div>
-                        <div>
-                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <button
-                                    onClick={() => paginate(Math.max(1, currentPage - 1))}
-                                    disabled={currentPage === 1}
-                                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    <span className="sr-only">Anterior</span>
-                                    <i className="pi pi-chevron-left"></i>
-                                </button>
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        onClick={() => paginate(i + 1)}
-                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === i + 1 ? 'z-10 bg-slate-700 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-500 hover:bg-slate-50'}`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                                    disabled={currentPage === totalPages}
-                                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    <span className="sr-only">Próximo</span>
-                                    <i className="pi pi-chevron-right"></i>
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
                 </div>
             </div>
         </main>

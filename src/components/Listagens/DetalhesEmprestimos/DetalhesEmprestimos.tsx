@@ -12,10 +12,6 @@ interface DetalhesEmprestimoProps {
     id_emprestimo: number;
 }
 
-/**
- * Componente que exibe os detalhes de um empréstimo.
- * Faz a consulta à API com base no ID fornecido e monta a visualização.
- */
 function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Element {
     const [emprestimo, setEmprestimo] = useState<EmprestimoDTO | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +22,6 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
         async function buscarDados() {
             setLoading(true);
             setError(null);
-
             try {
                 const dados = await EmprestimoRequests.obterEmprestimoPorId(id_emprestimo);
                 if (dados) {
@@ -45,24 +40,34 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
         buscarDados();
     }, [id_emprestimo]);
 
-    // Renderização do estado de carregamento (Skeleton)
+    const formatDate = (date?: Date) => {
+        if (!date) return "Não informado";
+        return new Date(date).toLocaleDateString('pt-BR');
+    };
+
+    const getStatusSeverity = (status?: string) => {
+        if (status === "Devolvido") return "success";
+        if (status === "Atrasado") return "danger";
+        return "info";
+    };
+
     if (loading) {
         return (
             <Card className="shadow-4">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-4">
-                        <Skeleton shape="circle" size="4rem"></Skeleton>
+                        <Skeleton shape="circle" size="4rem" />
                         <div className="flex-1">
-                            <Skeleton width="60%" height="2rem" className="mb-2"></Skeleton>
-                            <Skeleton width="40%"></Skeleton>
+                            <Skeleton width="60%" height="2rem" className="mb-2" />
+                            <Skeleton width="40%" />
                         </div>
                     </div>
                     <Divider />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
                             <div key={i}>
-                                <Skeleton width="30%" className="mb-2"></Skeleton>
-                                <Skeleton width="80%" height="1.5rem"></Skeleton>
+                                <Skeleton width="30%" className="mb-2" />
+                                <Skeleton width="80%" height="1.5rem" />
                             </div>
                         ))}
                     </div>
@@ -71,7 +76,6 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
         );
     }
 
-    // Renderização do estado de erro
     if (error || !emprestimo) {
         return (
             <div className="flex justify-center p-4">
@@ -80,16 +84,18 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
         );
     }
 
-    // Renderização dos detalhes do empréstimo
     return (
         <main className="bg-gray-200 flex-1 py-6 sm:py-10 px-4 overflow-y-auto">
-            <Card title={`Empréstimo #${emprestimo.id_emprestimo}`} className="shadow-lg animate-fade-in transition-all duration-300 w-full max-w-4xl p-4 sm:p-6 md:p-8 mx-auto font-bold text-xl">
+            <Card
+                title={`Empréstimo #${emprestimo.id_emprestimo}`}
+                className="shadow-lg animate-fade-in transition-all duration-300 w-full max-w-4xl p-4 sm:p-6 md:p-8 mx-auto font-bold text-xl"
+            >
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <span className="text-gray-500 font-medium tracking-tight">Status do Empréstimo</span>
                         <Tag
-                            value={emprestimo.status_emprestimo ?? "N/A"}
-                            severity={emprestimo.status_emprestimo_registro ? "success" : "danger"}
+                            value={emprestimo.status_emprestimo ?? "Indefinido"}
+                            severity={getStatusSeverity(emprestimo.status_emprestimo)}
                             className="px-3 py-1"
                         />
                     </div>
@@ -97,15 +103,17 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
                     <Divider />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
-                        {/* Seção do Aluno */}
+                        {/* Dados do Aluno */}
                         <div className="flex flex-col gap-4">
                             <h3 className="text-lg font-semibold text-primary-700 flex items-center gap-2">
-                                <i className="pi pi-user text-blue-500"></i> Informações do Aluno
+                                <i className="pi pi-user text-blue-500"></i> Dados do Aluno
                             </h3>
-                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-blue-50 relative pl-4">
+                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-blue-50 pl-4">
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Nome</span>
-                                    <span className="text-gray-700 font-medium">{emprestimo.aluno.nome} {emprestimo.aluno.sobrenome}</span>
+                                    <span className="text-gray-700 font-medium">
+                                        {emprestimo.aluno.nome} {emprestimo.aluno.sobrenome}
+                                    </span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">RA</span>
@@ -115,15 +123,19 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">E-mail</span>
                                     <span className="text-gray-700 font-medium break-all">{emprestimo.aluno.email ?? "Não informado"}</span>
                                 </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Celular</span>
+                                    <span className="text-gray-700 font-medium">{emprestimo.aluno.celular ?? "Não informado"}</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Seção do Livro */}
+                        {/* Dados do Livro */}
                         <div className="flex flex-col gap-4">
                             <h3 className="text-lg font-semibold text-primary-700 flex items-center gap-2">
-                                <i className="pi pi-book text-orange-500"></i> Informações do Livro
+                                <i className="pi pi-book text-orange-500"></i> Dados do Livro
                             </h3>
-                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-orange-50 relative pl-4">
+                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-orange-50 pl-4">
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Título</span>
                                     <span className="text-gray-700 font-medium">{emprestimo.livro.titulo ?? "Não informado"}</span>
@@ -136,24 +148,13 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">ISBN</span>
                                     <span className="text-gray-700 font-medium">{emprestimo.livro.isbn ?? "Não informado"}</span>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Seção de Datas */}
-                        <div className="flex flex-col gap-4">
-                            <h3 className="text-lg font-semibold text-primary-700 flex items-center gap-2">
-                                <i className="pi pi-calendar text-green-500"></i> Datas
-                            </h3>
-                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-green-50 relative pl-4">
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Data do Empréstimo</span>
-                                    <span className="text-gray-700 font-medium">{new Date(emprestimo.data_emprestimo).toLocaleDateString('pt-BR')}</span>
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Data de Retirada</span>
+                                    <span className="text-gray-700 font-medium">{formatDate(emprestimo.data_emprestimo)}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Data de Devolução</span>
-                                    <span className="text-gray-700 font-medium">
-                                        {emprestimo.data_devolucao ? new Date(emprestimo.data_devolucao).toLocaleDateString('pt-BR') : "Não devolvido"}
-                                    </span>
+                                    <span className="text-gray-700 font-medium">{formatDate(emprestimo.data_devolucao)}</span>
                                 </div>
                             </div>
                         </div>
@@ -161,15 +162,14 @@ function DetalhesEmprestimo({ id_emprestimo }: DetalhesEmprestimoProps): JSX.Ele
                 </div>
 
                 <style>{`
-                .animate-fade-in {
-                    animation: fadeIn 0.5s ease-out;
-                }
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
+                    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}</style>
             </Card>
+
             <div className="w-full max-w-4xl mx-auto mt-6 sm:mt-8">
                 <button
                     className="w-full bg-slate-700 hover:bg-slate-500 text-white px-4 py-3 md:mb-2 rounded-md font-bold transition-all shadow-md active:scale-95"

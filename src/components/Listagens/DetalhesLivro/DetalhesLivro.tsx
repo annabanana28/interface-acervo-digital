@@ -22,7 +22,6 @@ function DetalhesLivro({ id_livro }: DetalhesLivroProps): JSX.Element {
         async function buscarDados() {
             setLoading(true);
             setError(null);
-
             try {
                 const dados = await LivroRequests.obterLivroPorId(id_livro);
                 if (dados) {
@@ -46,18 +45,18 @@ function DetalhesLivro({ id_livro }: DetalhesLivroProps): JSX.Element {
             <Card className="shadow-4">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-4">
-                        <Skeleton shape="circle" size="4rem"></Skeleton>
+                        <Skeleton shape="circle" size="4rem" />
                         <div className="flex-1">
-                            <Skeleton width="60%" height="2rem" className="mb-2"></Skeleton>
-                            <Skeleton width="40%"></Skeleton>
+                            <Skeleton width="60%" height="2rem" className="mb-2" />
+                            <Skeleton width="40%" />
                         </div>
                     </div>
                     <Divider />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[1, 2, 3, 4].map((i) => (
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
                             <div key={i}>
-                                <Skeleton width="30%" className="mb-2"></Skeleton>
-                                <Skeleton width="80%" height="1.5rem"></Skeleton>
+                                <Skeleton width="30%" className="mb-2" />
+                                <Skeleton width="80%" height="1.5rem" />
                             </div>
                         ))}
                     </div>
@@ -86,38 +85,58 @@ function DetalhesLivro({ id_livro }: DetalhesLivroProps): JSX.Element {
                     <Divider />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
+                        {/* Informações Editoriais */}
                         <div className="flex flex-col gap-4">
                             <h3 className="text-lg font-semibold text-primary-700 flex items-center gap-2">
-                                <i className="pi pi-book text-blue-500"></i> Informações do Livro
+                                <i className="pi pi-book text-blue-500"></i> Informações Editoriais
                             </h3>
-                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-blue-50 relative pl-4">
+                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-blue-50 pl-4">
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Autor</span>
                                     <span className="text-gray-700 font-medium">{livro.autor}</span>
                                 </div>
                                 <div className="flex flex-col">
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Editora</span>
+                                    <span className="text-gray-700 font-medium">{livro.editora}</span>
+                                </div>
+                                <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Ano de Publicação</span>
                                     <span className="text-gray-700 font-medium">{livro.ano_publicacao}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Status</span>
+                                    <Tag
+                                        value={livro.status_livro ? "Disponível" : "Indisponível"}
+                                        severity={livro.status_livro ? "success" : "danger"}
+                                        className="w-fit mt-1 rounded-sm"
+                                    />
                                 </div>
                             </div>
                         </div>
 
+                        {/* Informações de Estoque */}
                         <div className="flex flex-col gap-4">
                             <h3 className="text-lg font-semibold text-primary-700 flex items-center gap-2">
-                                <i className="pi pi-info-circle text-orange-500"></i> Disponibilidade
+                                <i className="pi pi-box text-orange-500"></i> Estoque e Aquisição
                             </h3>
-                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-orange-50 relative pl-4">
+                            <div className="flex flex-col gap-3 ml-1 border-l-2 border-orange-50 pl-4">
+                                <div className="flex flex-col">
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Quantidade Total</span>
+                                    <span className="text-gray-700 font-medium">{livro.quant_total}</span>
+                                </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Quantidade Disponível</span>
                                     <span className="text-gray-700 font-medium">{livro.quant_disponivel}</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Status</span>
-                                    <Tag
-                                        value={livro.quant_disponivel > 0 ? "Disponível" : "Indisponível"}
-                                        severity={livro.quant_disponivel > 0 ? "success" : "danger"}
-                                        className="w-fit mt-1 rounded-sm"
-                                    />
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Quantidade Adquirida</span>
+                                    <span className="text-gray-700 font-medium">{livro.quant_aquisicao}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs uppercase text-gray-400 font-bold tracking-wider">Valor de Aquisição</span>
+                                    <span className="text-gray-700 font-medium">
+                                        {livro.valor_aquisicao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -125,9 +144,7 @@ function DetalhesLivro({ id_livro }: DetalhesLivroProps): JSX.Element {
                 </div>
 
                 <style>{`
-                    .animate-fade-in {
-                        animation: fadeIn 0.5s ease-out;
-                    }
+                    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
                     @keyframes fadeIn {
                         from { opacity: 0; transform: translateY(10px); }
                         to { opacity: 1; transform: translateY(0); }
